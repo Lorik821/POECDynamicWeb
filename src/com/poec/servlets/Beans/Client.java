@@ -1,4 +1,4 @@
-package com.poec.servlets;
+package com.poec.servlets.Beans;
 
 import java.time.LocalDate;
 import java.util.Date;

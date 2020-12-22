@@ -7,11 +7,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import com.poec.servlets.Beans.Client;
+import com.poec.servlets.Beans.Contrat;
+import com.poec.servlets.Beans.Sinistre;
+
 public class JDBC {
 	private Statement statement;
 	private Connection connection;
 	
-	public JDBC (String connectionURL, String user, String pass)
+	public JDBC ()
 	{
 		/*
 		Connection conn = null;
@@ -85,9 +89,12 @@ public class JDBC {
 		ResultSet resultSet = null;
 		ArrayList<Client> listeClients = new ArrayList<Client>();
 		
+		//Petite astuce ici qui permet de ne pas changer la requête sur l'utilisateur laisse des champs vide ; autrement sql fait une mauvaise recherche
+		if (prenom.equals("")) prenom = "   ";
+		if (nom.equals("")) nom = "   ";
+		if (codeClient.equals("")) codeClient = "  ";
+		
 		String selectSQL = "SELECT codeClient, nom, prenom, DAY(dateNaissance), MONTH(dateNaissance), YEAR(dateNaissance), adresse, codePostal, ville FROM clients where prenom like '" + prenom + "%' OR nom like '" + nom + "%' OR codeClient like '" + codeClient + "%'";
-		System.out.println (selectSQL);
-		//String selectSQL = "SELECT * FROM clients";
 		try {
 			resultSet = statement.executeQuery(selectSQL);
 		
@@ -100,6 +107,65 @@ public class JDBC {
 		}
 		
 		return listeClients;
+	}
+	
+	public ArrayList<Contrat> srchContratFor (Client client)
+	{
+		/* Création de l'objet gérant les requêtes */
+    	Statement statement = null;
+		try {
+			statement = connection.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		ResultSet resultSet = null;
+		ArrayList<Contrat> listeContrats = new ArrayList<Contrat>();
+		
+		String selectSQL = "SELECT codeContrat, IT, PE, IA, MT, CH, AV, FRIT, FRPE, FRIA, FRMT, FRCH, DAY(dateSignature), MONTH(dateSignature), YEAR(dateSignature) FROM contrats WHERE codeClient ='"+client.getCode()+"'";
+		try {
+			resultSet = statement.executeQuery(selectSQL);
+			
+			while (resultSet.next()) {
+				listeContrats.add(new Contrat (resultSet.getString(1), client, resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5), resultSet.getString(6), resultSet.getString(7), resultSet.getInt(8), resultSet.getInt(9), resultSet.getInt(10), resultSet.getInt(11), resultSet.getInt(12), resultSet.getString(13), resultSet.getString(14), resultSet.getString(15)));
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return listeContrats;
+	}
+	
+	public ArrayList<Sinistre> srchSinistreFor (Contrat contrat) 
+	{
+		/* Création de l'objet gérant les requêtes */
+    	Statement statement = null;
+		try {
+			statement = connection.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		ResultSet resultSet = null;
+		ArrayList<Sinistre> listeSinistres = new ArrayList<Sinistre>();
+		
+		String selectSQL = "SELECT codeSinistre, codeClient, typeSinistre, DAY(dateDuSinistre), MONTH(dateDuSinistre), YEAR(dateDuSinistre), prejudice FROM sinistres WHERE codeContrat ='"+contrat.getCode()+"'";
+		try {
+			resultSet = statement.executeQuery(selectSQL);
+			
+			while (resultSet.next()) {
+				listeSinistres.add(new Sinistre (resultSet.getString(1), contrat.getClient(), contrat, resultSet.getString(3), resultSet.getString(4), resultSet.getString(5), resultSet.getString(6), resultSet.getDouble(7)));
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return listeSinistres;
+		
 	}
 
 }
