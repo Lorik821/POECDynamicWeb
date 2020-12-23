@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.poec.servlets.Beans.Beneficiaire;
 import com.poec.servlets.Beans.Client;
 import com.poec.servlets.Beans.Contrat;
 import com.poec.servlets.Beans.Sinistre;
@@ -25,6 +26,7 @@ public class Main extends HttpServlet {
 	private ArrayList<Client> listClients;
 	private ArrayList<Contrat> listContrats;
 	private ArrayList<Sinistre> listSinistres;
+	private ArrayList<Beneficiaire> listBeneficiaires;
 	
 	private Client clientCourant;
 	private Contrat contratCourant;
@@ -43,6 +45,8 @@ public class Main extends HttpServlet {
 			listContrats (request);
 		else if (option.contentEquals("4"))
 			listSinistres (request);
+		else if (option.contentEquals("6"))
+			detailAssuranceVie (request);
 		
 		request.setAttribute( "test", message );
 		this.getServletContext().getRequestDispatcher( "/WEB-INF/vue.jsp" ).forward( request, response );
@@ -82,6 +86,38 @@ public class Main extends HttpServlet {
 		
 		return str;
 	}
+
+	public void detailAssuranceVie (HttpServletRequest request) 
+	{
+		String codeContrat = request.getParameter("codeContrat");
+		for (int i = 0 ; i < listContrats.size(); i++)
+			if (listContrats.get(i).getCode().equals(codeContrat)) contratCourant = listContrats.get(i);
+		
+		listBeneficiaires = jdbc.srchBeneficiairesFor(contratCourant);
+		message = makeDetailsAssuranceVie();
+	}
+	
+	public String makeDetailsAssuranceVie () 
+	{
+		String str = "";
+		
+		str += "<h3>Détail de l'assurance vie de " + clientCourant.getNom() + " " + clientCourant.getPrenom() + "</h3></br>";
+		str += "<p>Date de signature du contrat : " + contratCourant.getSignature() + "</p>";
+		str += "<table><caption>Liste des bénéficiaires de l'assurance vie</caption><tr><th>Bénéficiaire</th><th>Somme due</th></tr>";
+		try {
+			for (int i = 0 ; i < listBeneficiaires.size(); i++) {
+				str += "<tr><td>" + listBeneficiaires.get(i).getClient().getPrenom() + " " + listBeneficiaires.get(i).getClient().getNom() +"</td>";
+				str += "<td>" + listBeneficiaires.get(i).getSomme() + "</td></tr>";
+			}
+		}
+		catch (Exception e) {
+			str += "";	
+		}
+		str += "</table>";
+		
+		return str;
+	}
+	
 	
 	public void listContrats (HttpServletRequest request)
 	{
@@ -159,14 +195,19 @@ public class Main extends HttpServlet {
 		str += "</table>";*/
 		
 		String str = "";
+		String typeContrat = "";
 		str += "<script Language=\"JavaScript\">var list = [];var boutons = [];var indiceTab = 0;</script>";
 		str +="<table><caption>Liste des contrats pour "+clientCourant.getNom()+"</caption><tr><th>Code du contrat</th><th>Date de signature du contrat</th>";
 		for (int i = 0 ; i < listContrats.size(); i++) {
+			if (listContrats.get(i).isAssuranceVie())
+				typeContrat = "<td> <a title=\"VersAssuranceVie\" href=\"http://localhost:8080/POECDynamicWeb/acceuil?codeContrat="+listContrats.get(i).getCode()+"&option=6\">Détails de l'assurance vie</a></td>";
+			else
+				typeContrat = "<td> <a title=\"VersSinistres\" href=\"http://localhost:8080/POECDynamicWeb/acceuil?codeContrat="+listContrats.get(i).getCode()+"&option=4\">Consulter ses sinistres</a></td>";
 			str += "<tr >";
 			str += "<td>" + listContrats.get(i).getCode() + "</td>";
 			str += "<td>" + listContrats.get(i).getSignature() + "</td>";
 			str += "<td> <button id=\"ligne"+i+"\" type=\"button\">Voir/masquer détails</button>";
-			str += "<td> <a title=\"VersSinistres\" href=\"http://localhost:8080/POECDynamicWeb/acceuil?codeContrat="+listContrats.get(i).getCode()+"&option=4\">Consulter ses sinistres</a>";
+			str += typeContrat;
 			str += "</tr>";
 			str += "<script Language=\"JavaScript\">"
 				    + "boutons[indiceTab] = document.getElementById(\"ligne"+i+"\");"
@@ -215,7 +256,7 @@ public class Main extends HttpServlet {
 		str += "<table><caption>Liste des sinistres liés au contrat sélectionné</caption><tr><th>Code sinistre</th><th>Nom du signataire</th><th>Type du sinistre</th><th>Date du sinistre</th><th>Préjudice</th><th>Rembousable</th>";
 		for (int i = 0 ; i < listSinistres.size(); i++) {
 			for (int j = 0 ; j < contratCourant.getSinistresCouverts().size() ; j++) {
-				if (contratCourant.getSinistresCouverts().get(j).equals(listSinistres.get(i).getTypeSinistre()))
+				if (contratCourant.getSinistresCouverts().get(j).getTypeSinistre().equals(listSinistres.get(i).getTypeSinistre()))
 					franchise = contratCourant.getSinistresCouverts().get(j).getFranchise();
 			}
 			remboursable = listSinistres.get(i).getPrejudice() - franchise;

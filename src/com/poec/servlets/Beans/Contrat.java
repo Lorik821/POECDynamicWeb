@@ -8,6 +8,7 @@ public class Contrat {
 	private Client client;
 	private ArrayList<SinistreCouvert> sinistresCouverts;
 	private LocalDate signature;
+	private boolean assuranceVie;
 	
 	public Contrat () {
 		
@@ -24,6 +25,18 @@ public class Contrat {
 		if (ia.equals("1")) this.sinistresCouverts.add(new SinistreCouvert ("IA", fria));
 		if (mt.equals("1")) this.sinistresCouverts.add(new SinistreCouvert ("MT", frmt));
 		if (ch.equals("1")) this.sinistresCouverts.add(new SinistreCouvert ("CH", frch));
+		if (av.equals("1")) 
+			assuranceVie = true;
+		else 
+			assuranceVie = false;
+	}
+
+	public boolean isAssuranceVie() {
+		return assuranceVie;
+	}
+
+	public void setAssuranceVie(boolean assuranceVie) {
+		this.assuranceVie = assuranceVie;
 	}
 
 	public String getCode() {

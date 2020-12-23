@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import com.poec.servlets.Beans.Beneficiaire;
 import com.poec.servlets.Beans.Client;
 import com.poec.servlets.Beans.Contrat;
 import com.poec.servlets.Beans.Sinistre;
@@ -166,6 +167,66 @@ public class JDBC {
 		
 		return listeSinistres;
 		
+	}
+	
+	public ArrayList<Beneficiaire> srchBeneficiairesFor (Contrat contrat)
+	{
+		/* Création de l'objet gérant les requêtes */
+    	Statement statement = null;
+		try {
+			statement = connection.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		ResultSet resultSet = null;
+		ArrayList<Beneficiaire> listeBeneficiaires = new ArrayList<Beneficiaire>();
+		
+		String selectSQL = "SELECT codeClient, somme FROM assurancesVie WHERE codeContrat ='" + contrat.getCode() + "'";
+		try {
+			resultSet = statement.executeQuery(selectSQL);
+			
+			while (resultSet.next()) {
+				listeBeneficiaires.add(new Beneficiaire (srchClientFor(resultSet.getString(1)), contrat, resultSet.getDouble(2)));
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return listeBeneficiaires;
+	}
+		
+	/*
+	 * Retourne un client selon le codeClient
+	 */
+	private Client srchClientFor (String codeClient) 
+	{
+		/* Création de l'objet gérant les requêtes */
+    	Statement statement = null;
+		try {
+			statement = connection.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		ResultSet resultSet = null;
+		
+		String selectSQL = "SELECT nom, prenom, DAY(dateNaissance), MONTH(dateNaissance), YEAR(dateNaissance), adresse, codePostal, ville FROM clients WHERE codeClient='" +codeClient+"'";
+		try {
+			resultSet = statement.executeQuery(selectSQL);
+			
+			while (resultSet.next()) {
+				Client tmp = new Client (codeClient, resultSet.getString(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5), resultSet.getString(6), resultSet.getString(7), resultSet.getString(8)); 
+				System.out.println ("Nom du client nouvellement créé :  " + tmp.getNom());
+				return tmp;
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }
