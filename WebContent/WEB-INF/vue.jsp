@@ -5,7 +5,7 @@
     <head>
         <meta charset="utf-8" />
         <title>Gestion Assurances</title>
-        <link rel="stylesheet" href="CSS/style.css">
+        <link rel="stylesheet" href="CSS/stl.css">
     </head>
     <body>
         <p>Résultat de la recherche.</p>
@@ -19,6 +19,6 @@
             %>
         </p>
         </br>
-        <a title="Acceuil" href="http://localhost:8080/POECDynamicWeb/index.html">Retour à l'acceuil</a>
+        <a title="Acceuil" href="http://localhost:8080/POECDynamicWeb/index.html">Retour à l'accueil</a>
     </body>
 </html>

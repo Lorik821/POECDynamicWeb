@@ -131,73 +131,9 @@ public class Main extends HttpServlet {
 	}
 	
 	public String makeListContrats()
-
 	{
-		/*
-		String str = "";
-		str += "<script Language=\"JavaScript\">let list = new Array();let boutons = new Array();var indiceTab = 0;</script>";
-		str +="<table><caption>Liste des contrats pour "+clientCourant.getNom()+"</caption><tr><th>Code du contrat</th><th>Date de signature du contrat</th>";
-		for (int i = 0 ; i < listContrats.size(); i++) {
-			str += "<tr >";
-			str += "<td>" + listContrats.get(i).getCode() + "</td>";
-			str += "<td>" + listContrats.get(i).getSignature() + "</td>";
-			str += "<td> <button id=\"ligne"+i+"\" type=\"button\">Voir/masquer détails</button>";
-			str += "</tr>";
-			str += "<script Language=\"JavaScript\">boutons[indiceTab] = document.getElementById(\"ligne"+i+"\");</script>";
-			String sinistresCouverts = "";
-			for (int j = 0 ; j < listContrats.get(i).getSinistresCouverts().size(); j++) {
-				sinistresCouverts += listContrats.get(i).getSinistresCouverts().get(j).getTypeSinistre() + " franchise : ";
-				sinistresCouverts += listContrats.get(i).getSinistresCouverts().get(j).getFranchise() + "</br>";
-			}
-			//str += "<tr style=display:none><td>Sinistres couverts : " + sinistresCouverts + "</td></tr>";
-			str += "<tr id=\"dtlContrat"+i+"\" style=display:\"none\"><td colspan=\"2\" >" + sinistresCouverts + "</td></tr>";
-			str += "<SCRIPT Language=\"JavaScript\">list[indiceTab] = document.getElementById(\"dtlContrat"+i+"\");indiceTab++;</script>";
-		}
-		str += "<script Language=\"JavaScript\">function togg(idLigne) { if(getComputedStyle(idLigne).display != \"none\") { idLigne.style.display=\"none\"; } else { idLigne.style.display = \"block\";}};</script>";
-		str +="<script Language=\"JavaScript\">var i = 0; while (i < indiceTab) { boutons[i].onclick = togg(list[i]); i++; console.log(i);}</script>";
-		str += "</table>";*/
-		
-		/*
-		String str = "";
-		str += "<script Language=\"JavaScript\">var list = [];var boutons = [];var indiceTab = 0;</script>";
-		str +="<table><caption>Liste des contrats pour "+clientCourant.getNom()+"</caption><tr><th>Code du contrat</th><th>Date de signature du contrat</th>";
-		for (int i = 0 ; i < listContrats.size(); i++) {
-			str += "<tr >";
-			str += "<td>" + listContrats.get(i).getCode() + "</td>";
-			str += "<td>" + listContrats.get(i).getSignature() + "</td>";
-			str += "<td> <button id=\"ligne"+i+"\" type=\"button\">Voir/masquer détails</button>";
-			str += "</tr>";
-			str += "<script Language=\"JavaScript\">"
-					+ "boutons[indiceTab] = document.getElementById(\"ligne"+i+"\");"
-				    + "var test = document.getElementById(\"ligne1\");"
-				 + "</script>";
-			String sinistresCouverts = "";
-			for (int j = 0 ; j < listContrats.get(i).getSinistresCouverts().size(); j++) {
-				sinistresCouverts += listContrats.get(i).getSinistresCouverts().get(j).getTypeSinistre() + " franchise : ";
-				sinistresCouverts += listContrats.get(i).getSinistresCouverts().get(j).getFranchise() + "</br>";
-			}
-			//str += "<tr style=display:none><td>Sinistres couverts : " + sinistresCouverts + "</td></tr>";
-			str += "<tr id=\"dtlContrat"+i+"\" style=display:\"none\"><td colspan=\"2\" >" + sinistresCouverts + "</td></tr>";
-			str += "<SCRIPT Language=\"JavaScript\">"
-					+ "list[indiceTab] = document.getElementById(\"dtlContrat"+i+"\");"
-					+ "testD = document.getElementById(\"dtlContrat1\");"
-					+ "list[indiceTab].addEventListener(\"click\", () => { "
-						+ "if (getComputedStyle(testD).display != \"none\") { "
-							+ "testD.style.display = \"none\"; "
-						+ "} "
-							+ "else { "
-								+ "testD.style.display = \"block\""
-							+ "}"
-						+ "}"
-					+ ");"
-					+ "indiceTab++;"
-					+ "</script>";
-		}
-		str += "</table>";*/
-		
 		String str = "";
 		String typeContrat = "";
-		str += "<script Language=\"JavaScript\">var list = [];var boutons = [];var indiceTab = 0;</script>";
 		str +="<table><caption>Liste des contrats pour "+clientCourant.getNom()+"</caption><tr><th>Code du contrat</th><th>Date de signature du contrat</th>";
 		for (int i = 0 ; i < listContrats.size(); i++) {
 			if (listContrats.get(i).isAssuranceVie())
@@ -207,34 +143,37 @@ public class Main extends HttpServlet {
 			str += "<tr >";
 			str += "<td>" + listContrats.get(i).getCode() + "</td>";
 			str += "<td>" + listContrats.get(i).getSignature() + "</td>";
-			str += "<td> <button id=\"ligne"+i+"\" type=\"button\">Voir/masquer détails</button>";
+			if (!listContrats.get(i).isAssuranceVie()) {
+				str += "<td> <button type=\"button\" onclick=\"myFunction("+i+")\" class=\"bouton_declencheur\">Voir/masquer détails</button></td>";
+			}
+			else {
+				str += "<td> </td>";
+			}
+				
 			str += typeContrat;
 			str += "</tr>";
 			str += "<script Language=\"JavaScript\">"
 				    + "boutons[indiceTab] = document.getElementById(\"ligne"+i+"\");"
 				 + "</script>";
-			String sinistresCouverts = "";
-			for (int j = 0 ; j < listContrats.get(i).getSinistresCouverts().size(); j++) {
-				sinistresCouverts += listContrats.get(i).getSinistresCouverts().get(j).getTypeSinistre() + " franchise : ";
-				sinistresCouverts += listContrats.get(i).getSinistresCouverts().get(j).getFranchise() + " €</br>";
+			if (!listContrats.get(i).isAssuranceVie()) {
+				String sinistresCouverts = "";
+				for (int j = 0 ; j < listContrats.get(i).getSinistresCouverts().size(); j++) {
+					sinistresCouverts += listContrats.get(i).getSinistresCouverts().get(j).getTypeSinistre() + " franchise : ";
+					sinistresCouverts += listContrats.get(i).getSinistresCouverts().get(j).getFranchise() + " €</br>";
+				}
+				str += "<tr id=franchise"+i+" class=\"franchises\" id_contrat=\""+i+"\" style=display:\"none\"><td colspan=\"3\" >" + sinistresCouverts + "</td></tr>";
 			}
-			//str += "<tr style=display:none><td>Sinistres couverts : " + sinistresCouverts + "</td></tr>";
-			str += "<tr id=\"dtlContrat"+i+"\" style=display:\"none\"><td colspan=\"3\" >" + sinistresCouverts + "</td></tr>";
-			str += "<SCRIPT Language=\"JavaScript\">"
-					+ "list[indiceTab] = document.getElementById(\"dtlContrat"+i+"\");"
-					+ "boutons[indiceTab].addEventListener(\"click\", () => { "
-						+ "if (getComputedStyle(list[indiceTab]).display != \"none\") { "
-							+ "list[indiceTab].style.display = \"none\"; "
-						+ "} "
-							+ "else { "
-								+ "list[indiceTab].style.display = \"block\""
-							+ "}"
-						+ "}"
-					+ ");"
-					+ "indiceTab++;"
-					+ "</script>";
-		}
+		}		
 		str += "</table>";
+		
+		str += "<SCRIPT Language=\"JavaScript\">"
+				+ "function myFunction(i) {"
+				+ "var franchises = document.getElementById(\"franchise\"+i);"
+				+ "if (franchises.style.display != \"none\") {"
+				+ "franchises.style.display = \"none\";}"
+				+ "else { franchises.style.display = \"block\"}}"
+				+ "</script>";
+		
 		return str;
 	}
 	
